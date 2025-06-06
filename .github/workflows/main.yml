@@ -1,1 +1,31 @@
+name: Build and Push to GHCR
 
+on:
+  push:
+    branches:
+      - main  # 触发分支
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+
+
+    # 5. 构建 Docker 镜像
+    - name: Build Docker image
+      run: |
+        docker build -t arop:latest .
+    # 6. 登录 Docker Hub
+    - name: Log in to Docker Hub
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login docker.io -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    # 7. 推送 Docker 镜像
+    - name: Push Docker image
+      run: |
+        docker tag arop:latest pasceger/arop:latest
+        docker push pasceger/arop:latest
